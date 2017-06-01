@@ -1,4 +1,4 @@
-package com.github.florent37.materialviewpager.sample.fragment;
+package com.github.florent37.materialviewpager.sample;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -11,14 +11,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.github.florent37.materialviewpager.header.MaterialViewPagerHeaderDecorator;
-import com.github.florent37.materialviewpager.sample.R;
-import com.github.florent37.materialviewpager.sample.TestRecyclerViewAdapter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import jp.wasabeef.recyclerview.adapters.AlphaInAnimationAdapter;
+import jp.wasabeef.recyclerview.animators.ScaleInRightAnimator;
 
 /**
  * Created by florentchampigny on 24/04/15.
@@ -26,33 +25,39 @@ import butterknife.ButterKnife;
 public class RecyclerViewFragment extends Fragment {
 
     private static final boolean GRID_LAYOUT = false;
-    private static final int ITEM_COUNT = 100;
+
+    public DossierRecyclerViewAdapter myAdapter;
 
     @BindView(R.id.recyclerView)
+
     RecyclerView mRecyclerView;
 
-    public static RecyclerViewFragment newInstance() {
-        return new RecyclerViewFragment();
+    List<Dossier> items;
+
+    public static RecyclerViewFragment newInstance(List<Dossier> data) {
+
+        return new RecyclerViewFragment(data);
     }
+
+    public RecyclerViewFragment(List<Dossier> data){
+        this.items = data;
+    }
+
+    public RecyclerViewFragment(){
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_recyclerview, container, false);
+        View view = inflater.inflate(R.layout.fragment_recyclerview, container, false);
+        return view;
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState  ) {
         super.onViewCreated(view, savedInstanceState);
+
         ButterKnife.bind(this, view);
-
-        final List<Object> items = new ArrayList<>();
-
-        for (int i = 0; i < ITEM_COUNT; ++i) {
-            items.add(new Object());
-        }
-
-
-        //setup materialviewpager
 
         if (GRID_LAYOUT) {
             mRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
@@ -61,8 +66,21 @@ public class RecyclerViewFragment extends Fragment {
         }
         mRecyclerView.setHasFixedSize(true);
 
+        mRecyclerView.setItemAnimator(new ScaleInRightAnimator());
+
         //Use this now
         mRecyclerView.addItemDecoration(new MaterialViewPagerHeaderDecorator());
-        mRecyclerView.setAdapter(new TestRecyclerViewAdapter(items));
+
+        myAdapter = new DossierRecyclerViewAdapter(items);
+
+        AlphaInAnimationAdapter alphaAdapter = new AlphaInAnimationAdapter(myAdapter);
+
+        alphaAdapter.setDuration(200);
+
+        alphaAdapter.setFirstOnly(true);
+
+        mRecyclerView.setAdapter(alphaAdapter);
+
     }
+
 }

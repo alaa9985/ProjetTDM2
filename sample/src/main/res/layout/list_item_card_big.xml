@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    <android.support.v7.widget.CardView
+        xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/card_view"
         android:layout_width="match_parent"
@@ -18,6 +20,53 @@
         app:cardPreventCornerOverlap="false"
         app:contentPadding="0dp">
 
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="140dp"
+                android:layout_height="184dp"
+                android:layout_marginBottom="0dp"
+                android:layout_marginLeft="0dp"
+                android:layout_marginTop="0dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/dossier1" />
+
+            <TextView
+                android:id="@+id/montant_id"
+                android:layout_width="162dp"
+                android:layout_height="33dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="25dp"
+                android:text="TextView"
+                app:layout_constraintLeft_toRightOf="@+id/imageView"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintHorizontal_bias="0.099"
+                android:layout_marginEnd="8dp" />
+
+            <TextView
+                android:id="@+id/date_id"
+                android:layout_width="162dp"
+                android:layout_height="35dp"
+                android:text="TextView"
+                tools:layout_editor_absoluteY="78dp"
+                tools:layout_editor_absoluteX="146dp" />
+
+            <TextView
+                android:id="@+id/etat_id"
+                android:layout_width="162dp"
+                android:layout_height="35dp"
+                android:layout_marginLeft="0dp"
+                android:layout_marginTop="20dp"
+                android:text="TextView"
+                app:layout_constraintLeft_toLeftOf="@+id/montant_id"
+                app:layout_constraintTop_toBottomOf="@+id/date_id" />
+        </android.support.constraint.ConstraintLayout>
     </android.support.v7.widget.CardView>
 
 </FrameLayout>

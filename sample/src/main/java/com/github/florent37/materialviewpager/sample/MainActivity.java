@@ -3,77 +3,133 @@ package com.github.florent37.materialviewpager.sample;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
-
-import com.crashlytics.android.Crashlytics;
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.afollestad.materialdialogs.Theme;
 import com.github.florent37.materialviewpager.MaterialViewPager;
 import com.github.florent37.materialviewpager.header.HeaderDesign;
-import com.github.florent37.materialviewpager.sample.fragment.RecyclerViewFragment;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.fabric.sdk.android.Fabric;
 
-public class MainActivity extends DrawerActivity {
+public class MainActivity extends AppCompatActivity {
 
     @BindView(R.id.materialViewPager)
+
     MaterialViewPager mViewPager;
+
+    DatabaseReference database;
+
+    private FragmentStatePagerAdapter pageAdapter;
+
+
+    private  TrackGPS trackGPS ;
+
+    private RecyclerViewFragment rcf = RecyclerViewFragment.newInstance(Collections.<Dossier>emptyList());
+
+    private ScrollFragment scrf = ScrollFragment.newInstance();
+
+
+
+    String[] SPINNERLIST = {"Android Material Design", "Material Design Spinner", "Spinner Using Material Library", "Material Spinner Example"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
+
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+        trackGPS= new TrackGPS(MainActivity.this);
+
         setContentView(R.layout.activity_main);
-        setTitle("");
+
+        database = FirebaseDatabase.getInstance().getReference();
+
+
+        Log.e("Erroor","habsate hna");
+
+        //database = FirebaseDatabase.getInstance().getReference();
+
+        String refreshedToken = FirebaseInstanceId.getInstance().getToken();
+
+        Log.d("tag", "Refreshed token: " + refreshedToken);
+
+        //  gpsTracker = new GPSTracker(this);
+
+        user User = new user();
+
+        User.setId(database.child("installations").push().getKey());
+       if(trackGPS.canGetLocation){
+           User.setLatitude(trackGPS.getLatitude());
+           User.setLongitude(trackGPS.getLongitude());
+       }
+
+        // User.setLatitude(gpsTracker.getLatitude());
+
+        User.setToken(refreshedToken);
+
+        database.child("users").child(User.getId()).setValue(User);
+
+
+
+
         ButterKnife.bind(this);
 
-        final Toolbar toolbar = mViewPager.getToolbar();
-        if (toolbar != null) {
-            setSupportActionBar(toolbar);
-        }
-
-        mViewPager.getViewPager().setAdapter(new FragmentStatePagerAdapter(getSupportFragmentManager()) {
+        pageAdapter = new FragmentStatePagerAdapter(getSupportFragmentManager()) {
 
             @Override
             public Fragment getItem(int position) {
-                switch (position % 4) {
-                    //case 0:
-                    //    return RecyclerViewFragment.newInstance();
-                    //case 1:
-                    //    return RecyclerViewFragment.newInstance();
-                    //case 2:
-                    //    return WebViewFragment.newInstance();
-                    default:
-                        return RecyclerViewFragment.newInstance();
+                //
+                switch (position){
+                    case 0:
+                        return rcf;
+                    case 1:
+                         return scrf;
+
                 }
+                return null;
             }
 
             @Override
             public int getCount() {
-                return 4;
+                return 2;
             }
 
             @Override
             public CharSequence getPageTitle(int position) {
-                switch (position % 4) {
+                switch (position % 2) {
                     case 0:
-                        return "Selection";
+                        return "Mes dossiers";
                     case 1:
-                        return "Actualités";
-                    case 2:
-                        return "Professionnel";
-                    case 3:
-                        return "Divertissement";
+                        return "ajouter dossier";
                 }
                 return "";
             }
-        });
+        };
+
+
+        final Toolbar toolbar = mViewPager.getToolbar();
+
+        if (toolbar != null) {
+            setSupportActionBar(toolbar);
+        }
+
+        mViewPager.getViewPager().setAdapter(pageAdapter);
+
 
         mViewPager.setMaterialViewPagerListener(new MaterialViewPager.Listener() {
             @Override
@@ -116,5 +172,86 @@ public class MainActivity extends DrawerActivity {
                 }
             });
         }
+
+
+        final com.github.clans.fab.FloatingActionButton fab = (com.github.clans.fab.FloatingActionButton) findViewById(R.id.floatingActionButton);
+        fab.bringToFront();
+        fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.v("myTag","FAB Clicked");
+                   /* new MaterialDialog.Builder(MainActivity.this)
+                            .limitIconToDefaultSize()
+                            .title(R.string.example_prompt)
+                            .positiveText(R.string.allow)
+                            .negativeText(R.string.deny)
+                            .onAny(new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                    Toast.makeText(getApplicationContext(), "Yes, the Button is clickable", Toast.LENGTH_SHORT).show();
+                                }
+                            })
+                            .checkBoxPR.string.dont_ask_again, false, null)
+                            .show();*/
+                    boolean wrapInScrollView = true;
+                    new MaterialDialog.Builder(MainActivity.this )
+                            .title(R.string.title)
+                            .customView(R.layout.add_accident, wrapInScrollView)
+                            .positiveText(R.string.positive)
+                            .theme(Theme.LIGHT)
+                            .negativeText(R.string.negative)
+                            .show();
+                }
+            });
+
+        Log.e("Erroor","habsate hna2");
+    }
+    public void clicked(View v) {
+        Toast.makeText(getApplicationContext(), "Yes, the Button is clickable", Toast.LENGTH_SHORT).show();
+    }
+
+
+    /**
+     * Dispatch onResume() to fragments.  Note that for better inter-operation
+     * with older versions of the platform, at the point of this call the
+     * fragments attached to the activity are <em>not</em> resumed.  This means
+     * that in some cases the previous state may still be saved, not allowing
+     * fragment transactions that modify the state.  To correctly interact
+     * with fragments in their proper state, you should instead override
+     * {@link #onResumeFragments()}.
+     */
+    @Override
+    protected void onResume() {
+
+        super.onResume();
+
+        Log.e("Erroor","habsate hna3");
+
+        database.child("dossiers").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                List<Dossier> installations = new ArrayList<Dossier>();
+
+                for (DataSnapshot installationSnapshot : dataSnapshot.getChildren()) {
+
+
+                    Dossier installation = installationSnapshot.getValue(Dossier.class);
+
+                    installation.setId(installationSnapshot.getKey());
+
+                    // Log.i("ms",installation.getEtat().toString());
+
+                    installations.add(installation);
+                }
+
+                rcf.myAdapter.updateList(installations);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+
+        });
     }
 }

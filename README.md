@@ -64,7 +64,7 @@ with **header_logo.xml**
     android:id="@+id/logo_white"
     android:layout_width="wrap_content"
     android:layout_height="@dimen/materialviewpager_logoHeight"
-    android:text="Material is Good"
+    android:text="Assurance App"
     android:textSize="30sp"
     android:textColor="@android:color/white"/>
 ```

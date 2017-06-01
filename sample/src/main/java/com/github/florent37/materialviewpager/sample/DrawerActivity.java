@@ -34,9 +34,9 @@ public class DrawerActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawer, 0, 0);
-        mDrawer.setDrawerListener(mDrawerToggle);
+      // mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+      //  mDrawerToggle = new ActionBarDrawerToggle(this, mDrawer, 0, 0);
+      //  mDrawer.setDrawerListener(mDrawerToggle);
 
         final ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
